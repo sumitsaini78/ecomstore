@@ -1,16 +1,35 @@
 <?php
-// Database connection
-$conn = new mysqli("localhost", "root", "", "categories");
+session_start();
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Handle Add to Cart Logic
+if (isset($_POST['update_cart'])) {
+    $product_id = $_POST['product_id'];
+    $action = $_POST['action']; // 'add', 'increase', 'decrease'
+
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+
+    if ($action == 'add' || $action == 'increase') {
+        if (isset($_SESSION['cart'][$product_id])) {
+            $_SESSION['cart'][$product_id]['quantity'] += 1;
+        } else {
+            $product_name = $_POST['product_name'];
+            $product_price = $_POST['product_price'];
+            $_SESSION['cart'][$product_id] = ['name' => $product_name, 'price' => (float) $product_price, 'quantity' => 1];
+        }
+    } elseif ($action == 'decrease') {
+        if (isset($_SESSION['cart'][$product_id])) {
+            $_SESSION['cart'][$product_id]['quantity'] -= 1;
+            if ($_SESSION['cart'][$product_id]['quantity'] <= 0) {
+                unset($_SESSION['cart'][$product_id]);
+            }
+        }
+    }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
-
-// Fetch all categories
-$query = "SELECT * FROM categories ORDER BY id DESC";
-$result = $conn->query($query);
 ?>
-
 <!doctype html>
 <html lang="en">
 
@@ -44,7 +63,7 @@ $result = $conn->query($query);
     <!-- Navbar start -->
     <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4 sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand fs-1 fw-bold" style="color:#570d48;" href="#">Shodio</a>
+            <a class="navbar-brand fs-1 fw-bold" style="color:#570d48;" href="index.php">Shodio</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent">
@@ -60,10 +79,10 @@ $result = $conn->query($query);
 
                 <div class="d-flex gap-4 fs-4 align-items-center justify-content-center mt-3 mt-lg-0">
                     <a href="#" class="text-dark"><i class="fa-solid fa-user"></i></a>
-                    <a href="#" class="text-dark position-relative">
+                    <a href="cart.php" class="text-dark position-relative">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 10px;">0</span>
+                            style="font-size: 10px;"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>
                     </a>
                 </div>
             </div>
@@ -99,31 +118,6 @@ $result = $conn->query($query);
     <!-- offer banner Section ended -->
 
     <!-- Quick Category Menu starts -->
-     <!-- Quick Category Menu starts -->
-<div class="container-fluid bg-white py-3 shadow-sm border-bottom">
-    <div class="d-flex flex-nowrap overflow-x-auto gap-4 px-2 text-center no-scrollbar">
-
-        <?php
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                ?>
-                <a href="category.php?id=<?php echo $row['id']; ?>" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                    <!-- Using a placeholder image since we only stored names in the table -->
-                    <img src="https://placehold.co/100x100?text=<?php echo $row['category_name']; ?>" 
-                         class="rounded-circle border p-1"
-                         style="width: 70px; height: 70px; object-fit: cover;">
-                    <p class="small mt-2 mb-0 fw-medium"><?php echo $row['category_name']; ?></p>
-                </a>
-                <?php
-            }
-        } else {
-            echo "<p class='text-muted small'>No categories found.</p>";
-        }
-        ?>
-
-    </div>
-</div>
-<!-- Quick Category Menu ended -->
     <div class="container-fluid bg-white py-3 shadow-sm border-bottom">
         <!-- Added 'no-scrollbar' class here -->
         <div class="d-flex flex-nowrap overflow-x-auto gap-4 px-2 text-center no-scrollbar">
@@ -214,13 +208,32 @@ $result = $conn->query($query);
         <div class="row row-cols-2  row-cols-md-3 row-cols-lg-4 g-2">
             <!-- Product Item 1 -->
             <div class="col     ">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <img src="images/fruit.jpg" class="card-img-top p-2 rounded-4" alt="Product">
+                <div class="card h-100 border-0 shadow-sm product-card"><a href="product.php">
+                        <img src="images/fruit.jpg" class="card-img-top p-2 rounded-4" alt="Product"></a>
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Designer Festive Saree</h5>
+                        <h5 class="card-title fs-6">Elegant Silk Saree</h5>
                         <p class="card-text fw-bold text-success">₹1,499</p>
                         <div class="d-flex gap-1">
-                            <a href="#" class="btn btn-sm btn-outline-success w-50">Add to Cart</a>
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="1">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+                                <?php if (isset($_SESSION['cart'][1])): ?>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="decrease">-
+                                        </button>
+                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][1]['quantity']; ?></button>
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="increase">+
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <input type="hidden" name="action" value="add">
+                                    <button type="submit" name="update_cart"
+                                        class="btn btn-sm btn-outline-success w-100">Add</button>
+                                <?php endif; ?>
+                            </form>
                             <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
@@ -232,10 +245,29 @@ $result = $conn->query($query);
                 <div class="card h-100 border-0 shadow-sm product-card">
                     <img src="images/fruit1.jpg" class="card-img-top p-2 rounded-4" alt="Product">
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Designer Festive Saree</h5>
+                        <h5 class="card-title fs-6">Cotton Printed Kurti</h5>
                         <p class="card-text fw-bold text-success">₹1,499</p>
                         <div class="d-flex gap-1">
-                            <a href="#" class="btn btn-sm btn-outline-success w-50">Add to Cart</a>
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="2">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+                                <?php if (isset($_SESSION['cart'][2])): ?>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="decrease">-
+                                        </button>
+                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][2]['quantity']; ?></button>
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="increase">+
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <input type="hidden" name="action" value="add">
+                                    <button type="submit" name="update_cart"
+                                        class="btn btn-sm btn-outline-success w-100">Add</button>
+                                <?php endif; ?>
+                            </form>
                             <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
@@ -247,10 +279,29 @@ $result = $conn->query($query);
                 <div class="card h-100 border-0 shadow-sm product-card">
                     <img src="images/fruit.jpg" class="card-img-top p-2 rounded-4" alt="Product">
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Designer Festive Saree</h5>
+                        <h5 class="card-title fs-6">Traditional Banarasi Saree</h5>
                         <p class="card-text fw-bold text-success">₹1,499</p>
                         <div class="d-flex gap-1">
-                            <a href="#" class="btn btn-sm btn-outline-success w-50">Add to Cart</a>
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="3">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+                                <?php if (isset($_SESSION['cart'][3])): ?>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="decrease">-
+                                        </button>
+                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][3]['quantity']; ?></button>
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="increase">+
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <input type="hidden" name="action" value="add">
+                                    <button type="submit" name="update_cart"
+                                        class="btn btn-sm btn-outline-success w-100">Add</button>
+                                <?php endif; ?>
+                            </form>
                             <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
@@ -262,10 +313,29 @@ $result = $conn->query($query);
                 <div class="card h-100 border-0 shadow-sm product-card">
                     <img src="images/fruit3.jpg" class="card-img-top p-2 rounded-4" alt="Product">
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Designer Festive Saree</h5>
+                        <h5 class="card-title fs-6">Embroidered Party Wear</h5>
                         <p class="card-text fw-bold text-success">₹1,499</p>
                         <div class="d-flex gap-1">
-                            <a href="#" class="btn btn-sm btn-outline-success w-50">Add to Cart</a>
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="4">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+                                <?php if (isset($_SESSION['cart'][4])): ?>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="decrease">-
+                                        </button>
+                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][4]['quantity']; ?></button>
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="increase">+
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <input type="hidden" name="action" value="add">
+                                    <button type="submit" name="update_cart"
+                                        class="btn btn-sm btn-outline-success w-100">Add</button>
+                                <?php endif; ?>
+                            </form>
                             <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
@@ -277,10 +347,29 @@ $result = $conn->query($query);
                 <div class="card h-100 border-0 shadow-sm product-card">
                     <img src="images/fruit4.jpg" class="card-img-top p-2 rounded-4" alt="Product">
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Designer Festive Saree</h5>
+                        <h5 class="card-title fs-6">Floral Summer Dress</h5>
                         <p class="card-text fw-bold text-success">₹1,499</p>
                         <div class="d-flex gap-1">
-                            <a href="#" class="btn btn-sm btn-outline-success w-50">Add to Cart</a>
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="5">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+                                <?php if (isset($_SESSION['cart'][5])): ?>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="decrease">-
+                                        </button>
+                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][5]['quantity']; ?></button>
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="increase">+
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <input type="hidden" name="action" value="add">
+                                    <button type="submit" name="update_cart"
+                                        class="btn btn-sm btn-outline-success w-100">Add</button>
+                                <?php endif; ?>
+                            </form>
                             <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
@@ -293,10 +382,29 @@ $result = $conn->query($query);
                 <div class="card h-100 border-0 shadow-sm product-card">
                     <img src="images/fruit3.jpg" class="card-img-top p-2 rounded-4" alt="Product">
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Designer Festive Saree</h5>
+                        <h5 class="card-title fs-6">Casual Wear Tunic</h5>
                         <p class="card-text fw-bold text-success">₹1,499</p>
                         <div class="d-flex gap-1">
-                            <a href="#" class="btn btn-sm btn-outline-success w-50">Add to Cart</a>
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="6">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+                                <?php if (isset($_SESSION['cart'][6])): ?>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="decrease">-
+                                        </button>
+                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][6]['quantity']; ?></button>
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="increase">+
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <input type="hidden" name="action" value="add">
+                                    <button type="submit" name="update_cart"
+                                        class="btn btn-sm btn-outline-success w-100">Add</button>
+                                <?php endif; ?>
+                            </form>
                             <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
@@ -309,10 +417,29 @@ $result = $conn->query($query);
                 <div class="card h-100 border-0 shadow-sm product-card">
                     <img src="images/fruit3.jpg" class="card-img-top p-2 rounded-4" alt="Product">
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Designer Festive Saree</h5>
+                        <h5 class="card-title fs-6">Wedding Special Lehenga</h5>
                         <p class="card-text fw-bold text-success">₹1,499</p>
                         <div class="d-flex gap-1">
-                            <a href="#" class="btn btn-sm btn-outline-success w-50">Add to Cart</a>
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="7">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+                                <?php if (isset($_SESSION['cart'][7])): ?>
+                                    <div class="btn-group btn-group-sm w-100" role="group">
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="decrease">-
+                                        </button>
+                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][7]['quantity']; ?></button>
+                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
+                                            <input type="hidden" name="action" value="increase">+
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <input type="hidden" name="action" value="add">
+                                    <button type="submit" name="update_cart"
+                                        class="btn btn-sm btn-outline-success w-100">Add</button>
+                                <?php endif; ?>
+                            </form>
                             <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
