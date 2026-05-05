@@ -223,7 +223,8 @@ if (isset($_POST['update_cart'])) {
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="decrease">-
                                         </button>
-                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][1]['quantity']; ?></button>
+                                        <button type="button"
+                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][1]['quantity']; ?></button>
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="increase">+
                                         </button>
@@ -257,7 +258,8 @@ if (isset($_POST['update_cart'])) {
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="decrease">-
                                         </button>
-                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][2]['quantity']; ?></button>
+                                        <button type="button"
+                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][2]['quantity']; ?></button>
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="increase">+
                                         </button>
@@ -291,7 +293,8 @@ if (isset($_POST['update_cart'])) {
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="decrease">-
                                         </button>
-                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][3]['quantity']; ?></button>
+                                        <button type="button"
+                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][3]['quantity']; ?></button>
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="increase">+
                                         </button>
@@ -325,7 +328,8 @@ if (isset($_POST['update_cart'])) {
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="decrease">-
                                         </button>
-                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][4]['quantity']; ?></button>
+                                        <button type="button"
+                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][4]['quantity']; ?></button>
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="increase">+
                                         </button>
@@ -359,7 +363,8 @@ if (isset($_POST['update_cart'])) {
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="decrease">-
                                         </button>
-                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][5]['quantity']; ?></button>
+                                        <button type="button"
+                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][5]['quantity']; ?></button>
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="increase">+
                                         </button>
@@ -394,7 +399,8 @@ if (isset($_POST['update_cart'])) {
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="decrease">-
                                         </button>
-                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][6]['quantity']; ?></button>
+                                        <button type="button"
+                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][6]['quantity']; ?></button>
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="increase">+
                                         </button>
@@ -429,7 +435,8 @@ if (isset($_POST['update_cart'])) {
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="decrease">-
                                         </button>
-                                        <button type="button" class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][7]['quantity']; ?></button>
+                                        <button type="button"
+                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][7]['quantity']; ?></button>
                                         <button type="submit" name="update_cart" value="1" class="btn btn-success">
                                             <input type="hidden" name="action" value="increase">+
                                         </button>
