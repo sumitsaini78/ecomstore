@@ -7,7 +7,6 @@ if (isset($_POST['update_cart'])) {
     $action = $_POST['action']; // 'add', 'increase', 'decrease'
 
     if (!isset($_SESSION['cart'])) {
-
         $_SESSION['cart'] = [];
     }
 
@@ -30,6 +29,21 @@ if (isset($_POST['update_cart'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
+?>
+<?php
+// Database connection include karein
+include("admin/db.php"); // Semicolon (;) missing tha
+
+// SQL Query: Columns ke beech comma (,) lagana zaruri hai
+$result = mysqli_query($conn, "SELECT id, name, description, price FROM products");
+
+// Check karein ki query sahi chali ya nahi
+if (!$result) {
+    die("Query Failed: " . mysqli_error($conn));
+}
+
+// Loop ka use karein saare products fetch karne ke liye
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -79,40 +93,12 @@ if (isset($_POST['update_cart'])) {
                 </form>
 
                 <div class="d-flex gap-4 fs-4 align-items-center justify-content-center mt-3 mt-lg-0">
-                    <div class="d-flex gap-4 fs-4 align-items-center justify-content-center mt-3 mt-lg-0">
-                        <?php if (isset($_SESSION['user_id'])): ?>
-                            <div class="dropdown">
-                                <a class="text-dark text-decoration-none dropdown-toggle fs-6 fw-bold" href="#"
-                                    role="button" data-bs-toggle="dropdown">
-                                    <i class="fa-solid fa-circle-user me-1"></i>
-                                    Hi, <?php echo explode(' ', $_SESSION['user_name'])[0]; ?>
-                                </a>
-                                <ul class="dropdown-menu shadow-sm">
-                                    <li><a class="dropdown-item" href="profile.php"><i class="fa-solid fa-id-card me-2"></i>
-                                            My Profile</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item text-danger" href="logout.php"><i
-                                                class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
-                                </ul>
-                            </div>
-                        <?php else: ?>
-                            <a href="login.php" class="text-dark text-decoration-none fs-6 fw-bold">
-                                <i class="fa-solid fa-user"></i> Login
-                            </a>
-                        <?php endif; ?>
-
-                        <a href="checkout.php" class="text-dark position-relative">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                style="font-size: 10px;">
-                                <?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>
-                            </span>
-                        </a>
-                    </div>
-
+                    <a href="#" class="text-dark"><i class="fa-solid fa-user"></i></a>
+                    <a href="cart.php" class="text-dark position-relative">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 10px;"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -240,8 +226,11 @@ if (isset($_POST['update_cart'])) {
                 <div class="card h-100 border-0 shadow-sm product-card"><a href="product.php">
                         <img src="images/fruit.jpg" class="card-img-top p-2 rounded-4" alt="Product"></a>
                     <div class="card-body">
-                        <h5 class="card-title fs-6">Elegant Silk Saree</h5>
-                        <p class="card-text fw-bold text-success">₹1,499</p>
+                        <h5 class="card-title fs-6"><?php 
+                            // Ab aap print_r ki jagah formatted HTML use kar sakte hain
+                            echo $row['name'] . "<br>";
+                        ?></h5>
+                        <p class="card-text fw-bold text-success"><?php echo $row['price']; ?></p>
                         <div class="d-flex gap-1">
                             <form method="POST" class="w-50">
                                 <input type="hidden" name="product_id" value="1">
@@ -264,7 +253,13 @@ if (isset($_POST['update_cart'])) {
                                         class="btn btn-sm btn-outline-success w-100">Add</button>
                                 <?php endif; ?>
                             </form>
-                            <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
+                            <form method="POST" class="w-50">
+                                <input type="hidden" name="product_id" value="1">
+                                <input type="hidden" name="product_name" value="Designer Festive Saree">
+                                <input type="hidden" name="product_price" value="1499">
+
+                            </form>
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-50"><i
                                     class="fa-regular fa-heart"></i></button>
                         </div>
                     </div>
