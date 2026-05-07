@@ -1,0 +1,86 @@
+Frontend (Customer Side):
+- index.php → Homepage with dynamic banners, featured products, categories  / Done
+- product.php → Product detail page with variations (size, color) / done
+- cart.php → Shopping cart with quantity update, remove  / done
+- checkout.php → Checkout form & order confirmation  / done         
+- signup.php / login.php / logout.php → User authentication / done
+- profile.php → User profile, orders, wishlist
+- contact.php → Contact form (DB + email)
+
+- search.php → Product search and filters
+
+Backend (Admin Panel):
+- admin/index.php → Admin login
+- admin/dashboard.php → Analytics overview
+- admin/products.php → Manage products (add/edit/delete)
+- admin/categories.php → Manage categories
+- admin/vendors.php → Manage vendors/sellers
+- admin/orders.php → Manage customer orders
+- admin/coupons.php → Create/manage coupons and discounts
+- admin/reports.php → Sales & order reports
+- admin/settings.php → Site, theme, SEO settings
+
+Vendor Panel:
+- vendor/dashboard.php → Vendor-specific analytics
+- vendor/products.php → Vendor product management
+- vendor/orders.php → Orders for vendor's products
+
+Shared:
+- db.php → Database connection
+- includes/ → header.php, footer.php for frontend and backend
+- api/ → Expose REST endpoints for products, orders
+🏗 Features & Requirements
+1. Frontend (User Side)
+- Responsive landing page with dynamic content from DB
+- Product detail pages with variations (size, color, stock)
+- Shopping cart and checkout with validation
+- User authentication with sessions, cookies, secure passwords
+- Profile with order history and wishlist
+- Product search with filters (price, category, rating)
+- Review & rating system for products
+- Contact/feedback form stored in DB + email notification
+- Multi-currency and localization support
+2. Backend (Admin Panel)
+- Dashboard with analytics (sales, top products, users)
+- Manage products, categories, vendors, users, and orders
+- Create and manage coupons/discounts
+- Change order statuses (Pending, Processing, Shipped, Delivered)
+- Control homepage banners and featured sections dynamically
+- Configure SEO metadata and theme settings
+- Generate and export reports (CSV/PDF)
+3. Vendor Panel
+- Vendor login and dashboard
+- Manage vendor's products (CRUD)
+- View and manage orders specific to vendor's products
+- Vendor analytics (sales, orders)
+
+
+4. Database Schema (MySQL)
+- users (id, name, email, password, role, created_at)
+- vendors (id, user_id, name, status)
+- products (id, vendor_id, name, description, price, stock, image, category_id, created_at)
+- product_variations (id, product_id, attribute, value, stock)
+- categories (id, name, created_at)
+- orders (id, user_id, total_amount, status, created_at)
+- order_items (id, order_id, product_id, quantity, price)
+- coupons (id, code, discount_type, value, expiry)
+- reviews (id, product_id, user_id, rating, comment, created_at)
+- feedback (id, name, email, message, created_at)
+- admin (id, username, password)
+
+
+5. Security & Best Practices
+- Use password_hash() and password_verify() for secure password storage
+- Implement prepared statements to prevent SQL injection
+- Role-based access: customer, vendor, admin
+- Session management for user and admin areas
+- Input validation and sanitization for all forms
+- Token-based authentication for API endpoints
+🌟 Advanced Features
+- API endpoints for mobile app integration
+- Wishlist, favorites, recently viewed products
+- Product import/export via CSV
+- SEO-friendly URLs and sitemap generation
+- Newsletter and email marketing integration
+- Live chat or product Q&A system
+- Payment gateways integration (COD, Stripe, Razorpay sandbox)

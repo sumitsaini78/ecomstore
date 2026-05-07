@@ -7,6 +7,7 @@ if (isset($_POST['update_cart'])) {
     $action = $_POST['action']; // 'add', 'increase', 'decrease'
 
     if (!isset($_SESSION['cart'])) {
+
         $_SESSION['cart'] = [];
     }
 
@@ -78,12 +79,40 @@ if (isset($_POST['update_cart'])) {
                 </form>
 
                 <div class="d-flex gap-4 fs-4 align-items-center justify-content-center mt-3 mt-lg-0">
-                    <a href="#" class="text-dark"><i class="fa-solid fa-user"></i></a>
-                    <a href="cart.php" class="text-dark position-relative">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 10px;"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>
-                    </a>
+                    <div class="d-flex gap-4 fs-4 align-items-center justify-content-center mt-3 mt-lg-0">
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <div class="dropdown">
+                                <a class="text-dark text-decoration-none dropdown-toggle fs-6 fw-bold" href="#"
+                                    role="button" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-circle-user me-1"></i>
+                                    Hi, <?php echo explode(' ', $_SESSION['user_name'])[0]; ?>
+                                </a>
+                                <ul class="dropdown-menu shadow-sm">
+                                    <li><a class="dropdown-item" href="profile.php"><i class="fa-solid fa-id-card me-2"></i>
+                                            My Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item text-danger" href="logout.php"><i
+                                                class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                                </ul>
+                            </div>
+                        <?php else: ?>
+                            <a href="login.php" class="text-dark text-decoration-none fs-6 fw-bold">
+                                <i class="fa-solid fa-user"></i> Login
+                            </a>
+                        <?php endif; ?>
+
+                        <a href="checkout.php" class="text-dark position-relative">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 10px;">
+                                <?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>
+                            </span>
+                        </a>
+                    </div>
+
                 </div>
             </div>
         </div>
