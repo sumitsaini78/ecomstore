@@ -222,225 +222,67 @@ if (!$result) {
 
         <div class="row row-cols-2  row-cols-md-3 row-cols-lg-4 g-2">
             <!-- Product Item 1 -->
-            <div class="col     ">
-                <div class="card h-100 border-0 shadow-sm product-card"><a href="product.php">
-                        <img src="images/fruit.jpg" class="card-img-top p-2 rounded-4" alt="Product"></a>
-                    <div class="card-body">
-                        <h5 class="card-title fs-6"><?php 
-                            // Ab aap print_r ki jagah formatted HTML use kar sakte hain
-                            echo $row['name'] . "<br>";
-                        ?></h5>
-                        <p class="card-text fw-bold text-success"><?php echo $row['price']; ?></p>
-                        <div class="d-flex gap-1">
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="1">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
-                                <?php if (isset($_SESSION['cart'][1])): ?>
-                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="decrease">-
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][1]['quantity']; ?></button>
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="increase">+
-                                        </button>
-                                    </div>
-                                <?php else: ?>
-                                    <input type="hidden" name="action" value="add">
-                                    <button type="submit" name="update_cart"
-                                        class="btn btn-sm btn-outline-success w-100">Add</button>
-                                <?php endif; ?>
-                            </form>
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="1">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
+            <?php
+            // 1. Ensure your query selects the necessary fields
+// $result = mysqli_query($conn, "SELECT id, name, price, image FROM products");
+            
+            while ($row = mysqli_fetch_assoc($result)):
+                $id = $row['id']; // Use the actual ID from your DB
+                ?>
+                <div class="col mb-4">
+                    <div class="card h-100 border-0 shadow-sm product-card">
+                        <a href="product.php?id=<?php echo $id; ?>">
+                            <!-- Dynamic Image -->
+                            <img src="images/<?php echo $row['image']; ?>" class="card-img-top p-2 rounded-4"
+                                alt="<?php echo $row['name']; ?>">
+                        </a>
 
-                            </form>
-                            <button type="submit" class="btn btn-sm btn-outline-danger w-50"><i
-                                    class="fa-regular fa-heart"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Product Item 2 -->
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <img src="images/fruit1.jpg" class="card-img-top p-2 rounded-4" alt="Product">
-                    <div class="card-body">
-                        <h5 class="card-title fs-6">Cotton Printed Kurti</h5>
-                        <p class="card-text fw-bold text-success">₹1,499</p>
-                        <div class="d-flex gap-1">
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="2">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
-                                <?php if (isset($_SESSION['cart'][2])): ?>
-                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="decrease">-
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][2]['quantity']; ?></button>
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="increase">+
-                                        </button>
-                                    </div>
-                                <?php else: ?>
-                                    <input type="hidden" name="action" value="add">
-                                    <button type="submit" name="update_cart"
-                                        class="btn btn-sm btn-outline-success w-100">Add</button>
-                                <?php endif; ?>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
-                                    class="fa-regular fa-heart"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Product Item 3 -->
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <img src="images/fruit.jpg" class="card-img-top p-2 rounded-4" alt="Product">
-                    <div class="card-body">
-                        <h5 class="card-title fs-6">Traditional Banarasi Saree</h5>
-                        <p class="card-text fw-bold text-success">₹1,499</p>
-                        <div class="d-flex gap-1">
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="3">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
-                                <?php if (isset($_SESSION['cart'][3])): ?>
-                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="decrease">-
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][3]['quantity']; ?></button>
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="increase">+
-                                        </button>
-                                    </div>
-                                <?php else: ?>
-                                    <input type="hidden" name="action" value="add">
-                                    <button type="submit" name="update_cart"
-                                        class="btn btn-sm btn-outline-success w-100">Add</button>
-                                <?php endif; ?>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
-                                    class="fa-regular fa-heart"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Product Item 4 -->
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <img src="images/fruit3.jpg" class="card-img-top p-2 rounded-4" alt="Product">
-                    <div class="card-body">
-                        <h5 class="card-title fs-6">Embroidered Party Wear</h5>
-                        <p class="card-text fw-bold text-success">₹1,499</p>
-                        <div class="d-flex gap-1">
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="4">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
-                                <?php if (isset($_SESSION['cart'][4])): ?>
-                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="decrease">-
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][4]['quantity']; ?></button>
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="increase">+
-                                        </button>
-                                    </div>
-                                <?php else: ?>
-                                    <input type="hidden" name="action" value="add">
-                                    <button type="submit" name="update_cart"
-                                        class="btn btn-sm btn-outline-success w-100">Add</button>
-                                <?php endif; ?>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
-                                    class="fa-regular fa-heart"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Product Item 5 -->
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <img src="images/fruit4.jpg" class="card-img-top p-2 rounded-4" alt="Product">
-                    <div class="card-body">
-                        <h5 class="card-title fs-6">Floral Summer Dress</h5>
-                        <p class="card-text fw-bold text-success">₹1,499</p>
-                        <div class="d-flex gap-1">
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="5">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
-                                <?php if (isset($_SESSION['cart'][5])): ?>
-                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="decrease">-
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][5]['quantity']; ?></button>
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="increase">+
-                                        </button>
-                                    </div>
-                                <?php else: ?>
-                                    <input type="hidden" name="action" value="add">
-                                    <button type="submit" name="update_cart"
-                                        class="btn btn-sm btn-outline-success w-100">Add</button>
-                                <?php endif; ?>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
-                                    class="fa-regular fa-heart"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <div class="card-body">
+                            <!-- Dynamic Name -->
+                            <h5 class="card-title fs-6"><?php echo $row['name']; ?></h5>
 
-            <!-- Product Item 6 -->
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <img src="images/fruit3.jpg" class="card-img-top p-2 rounded-4" alt="Product">
-                    <div class="card-body">
-                        <h5 class="card-title fs-6">Casual Wear Tunic</h5>
-                        <p class="card-text fw-bold text-success">₹1,499</p>
-                        <div class="d-flex gap-1">
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="6">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
-                                <?php if (isset($_SESSION['cart'][6])): ?>
-                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="decrease">-
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][6]['quantity']; ?></button>
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="increase">+
-                                        </button>
-                                    </div>
-                                <?php else: ?>
-                                    <input type="hidden" name="action" value="add">
-                                    <button type="submit" name="update_cart"
-                                        class="btn btn-sm btn-outline-success w-100">Add</button>
-                                <?php endif; ?>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
-                                    class="fa-regular fa-heart"></i></button>
+                            <!-- Dynamic Price -->
+                            <p class="card-text fw-bold text-success">₹<?php echo $row['price']; ?></p>
+
+                            <div class="d-flex gap-1">
+                                <form method="POST" class="w-100">
+                                    <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                                    <input type="hidden" name="product_name" value="<?php echo $row['name']; ?>">
+                                    <input type="hidden" name="product_price" value="<?php echo $row['price']; ?>">
+
+                                    <?php if (isset($_SESSION['cart'][$id])): ?>
+                                        <div class="btn-group btn-group-sm w-100" role="group">
+                                            <button type="submit" name="update_cart" class="btn btn-success">
+                                                <input type="hidden" name="action" value="decrease">-
+                                            </button>
+                                            <button type="button" class="btn btn-success disabled fw-bold">
+                                                <?php echo $_SESSION['cart'][$id]['quantity']; ?>
+                                            </button>
+                                            <button type="submit" name="update_cart" class="btn btn-success">
+                                                <input type="hidden" name="action" value="increase">+
+                                            </button>
+                                        </div>
+                                    <?php else: ?>
+                                        <input type="hidden" name="action" value="add">
+                                        <button type="submit" name="update_cart"
+                                            class="btn btn-sm btn-outline-success w-100">Add to Cart</button>
+                                    <?php endif; ?>
+                                </form>
+                                <form method="POST" action="wishlist_action.php" class="w-100">
+    <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+    <input type="hidden" name="product_name" value="<?php echo $row['name']; ?>">
+    <!-- Include user_id from session if logged in -->
+    <button type="submit" name="add_to_wishlist" class="btn btn-sm btn-outline-danger w-25">
+        <i class="fa-regular fa-heart"></i>
+    </button>
+</form>
+
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            <?php endwhile; ?>
+
 
             <!-- Product Item 8 -->
             <div class="col">
