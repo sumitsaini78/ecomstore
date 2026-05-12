@@ -7,7 +7,7 @@ Frontend (Customer Side):
 - profile.php → User profile, orders, wishlist  / done 
 - contact.php → Contact form (DB + email) / done
 
-- search.php → Product search and filters
+- search.php → Product search and filters / done
 
 Backend (Admin Panel):
 - admin/index.php → Admin login
