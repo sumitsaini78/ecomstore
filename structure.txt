@@ -5,7 +5,7 @@ Frontend (Customer Side):
 - checkout.php → Checkout form & order confirmation  / done         
 - signup.php / login.php / logout.php → User authentication / done
 - profile.php → User profile, orders, wishlist  / done 
-- contact.php → Contact form (DB + email)
+- contact.php → Contact form (DB + email) / done
 
 - search.php → Product search and filters
 

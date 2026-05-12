@@ -1,10 +1,11 @@
 <?php
 session_start();
+include("admin/db.php");
 
-// Handle Add to Cart Logic
+// 1. Handle Add/Update Cart Logic
 if (isset($_POST['update_cart'])) {
     $product_id = $_POST['product_id'];
-    $action = $_POST['action']; // 'add', 'increase', 'decrease'
+    $action = $_POST['action'];
 
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
@@ -16,7 +17,11 @@ if (isset($_POST['update_cart'])) {
         } else {
             $product_name = $_POST['product_name'];
             $product_price = $_POST['product_price'];
-            $_SESSION['cart'][$product_id] = ['name' => $product_name, 'price' => (float) $product_price, 'quantity' => 1];
+            $_SESSION['cart'][$product_id] = [
+                'name' => $product_name,
+                'price' => (float) $product_price,
+                'quantity' => 1
+            ];
         }
     } elseif ($action == 'decrease') {
         if (isset($_SESSION['cart'][$product_id])) {
@@ -29,22 +34,14 @@ if (isset($_POST['update_cart'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
-?>
-<?php
-// Database connection include karein
-include("admin/db.php"); // Semicolon (;) missing tha
 
-// SQL Query: Columns ke beech comma (,) lagana zaruri hai
-$result = mysqli_query($conn, "SELECT id, name, description, price FROM products");
-
-// Check karein ki query sahi chali ya nahi
-if (!$result) {
+// 2. Fetch Products (Using a unique variable name: $product_result)
+$product_result = mysqli_query($conn, "SELECT id, name, description, price, image FROM products");
+if (!$product_result) {
     die("Query Failed: " . mysqli_error($conn));
 }
-
-// Loop ka use karein saare products fetch karne ke liye
-
 ?>
+
 <!doctype html>
 <html lang="en">
 
@@ -55,281 +52,222 @@ if (!$result) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Shodio - EcomStore</title>
     <style>
+        :root {
+            --brand-color: #570d48;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
         .no-scrollbar {
             -ms-overflow-style: none;
-
-            /* Firefox */
             scrollbar-width: none;
         }
 
-        .Product-cards {
-            height: 100%;
+        .product-card {
+            transition: transform 0.2s;
+            border-radius: 15px !important;
+            overflow: hidden;
         }
 
-        @media screen and (min-width:600px) {
-            .product-card {
-                border: 2px solid red;
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .banner-img {
+            height: 350px;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            .banner-img {
+                height: 160px;
             }
         }
     </style>
 </head>
 
-<body class="p-0 m-0 border-0 bg-light">
-    <!-- Navbar start -->
+<body class="bg-light">
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4 sticky-top">
         <div class="container-fluid">
-            <a class="navbar-brand fs-1 fw-bold" style="color:#570d48;" href="index.php">Shodio</a>
+            <a class="navbar-brand fs-1 fw-bold" style="color: var(--brand-color);" href="index.php">Shodio</a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <form class="d-flex mx-auto mt-2 mt-lg-0" role="search">
-                    <input class="form-control me-2" type="search"
-                        placeholder="Try Saree, Kurti or Search by Product Code" style="width:400px; max-width: 100%;">
+            <div class="collapse navbar-collapse" id="navContent">
+                <form class="d-flex mx-auto mt-2 mt-lg-0" action="search.php" method="GET" role="search">
+                    <!-- 'name' attribute dena bahut zaroori hai -->
+                    <input class="form-control me-2" type="search" name="q"
+                        placeholder="Try Saree, Kurti or Search by Product Code" style="width:400px; max-width: 100%;"
+                        required>
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
 
                 <div class="d-flex gap-4 fs-4 align-items-center justify-content-center mt-3 mt-lg-0">
-                    <a href="#" class="text-dark"><i class="fa-solid fa-user"></i></a>
+                    <!-- USER LOGIN LOGIC -->
+                    <?php
+                    if (isset($_SESSION['user_id'])):
+                        $u_id = $_SESSION['user_id'];
+                        // Unique variable name for user query
+                        $user_res = mysqli_query($conn, "SELECT name FROM users WHERE id = '$u_id'");
+                        $user_data = mysqli_fetch_assoc($user_res);
+                        ?>
+                        <div class="dropdown">
+                            <a href="#" class="text-dark dropdown-toggle text-decoration-none d-flex align-items-center"
+                                data-bs-toggle="dropdown">
+                                <i class="fa-solid fa-circle-user text-success me-1"></i>
+                                <span class="fs-6 fw-bold"><?= explode(' ', $user_data['name'])[0]; ?></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li><a class="dropdown-item" href="profile.php"><i
+                                            class="fa-solid fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="orders.php"><i
+                                            class="fa-solid fa-box me-2"></i>Orders</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item text-danger" href="logout.php"><i
+                                            class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    <?php else: ?>
+                        <a href="login.php" class="text-dark" title="Login"><i class="fa-solid fa-user"></i></a>
+                    <?php endif; ?>
+
+                    <!-- CART ICON -->
                     <a href="cart.php" class="text-dark position-relative">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 10px;"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>
+                            style="font-size: 10px;">
+                            <?= isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>
+                        </span>
                     </a>
+                    <a href="contact-us.php"><i class="fa-solid fa-headset"></i></a>
                 </div>
             </div>
         </div>
     </nav>
-    <!-- Navbar ended -->
 
-    <!-- offer banner Section start -->
-    <div class="container my-3">
-        <div class="row justify-content-center">
-            <!-- Laptop par width 75% (col-lg-9), Mobile par 100% -->
-            <div class="col-12 col-lg-9">
-
-                <div id="ecomHeroCarousel" class="carousel slide shadow-sm rounded-3 overflow-hidden"
-                    data-bs-ride="carousel">
-                    <div class="carousel-inner">
-
-                        <div class="carousel-item active">
-                            <!-- Yahan 'banner-img' class use ki hai jo CSS se control ho rahi hai -->
-                            <img src="images/offer.jpg" class="d-block w-100 banner-img" alt="Offer 1">
-                        </div>
-
-                        <div class="carousel-item">
-                            <img src="images/offer2.jpg" class="d-block w-100 banner-img" alt="Offer 2">
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- offer banner Section ended -->
-
-    <!-- Quick Category Menu starts -->
-    <div class="container-fluid bg-white py-3 shadow-sm border-bottom">
-        <!-- Added 'no-scrollbar' class here -->
+    <!-- Categories Menu -->
+    <div class="container-fluid bg-white py-3 shadow-sm border-bottom mb-4">
         <div class="d-flex flex-nowrap overflow-x-auto gap-4 px-2 text-center no-scrollbar">
-
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Saree</p>
-            </a>
-
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit1.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Kurti</p>
-            </a>
-
-            <!-- Repeat for other categories... -->
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit2.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Suits</p>
-            </a>
-
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Kids</p>
-            </a>
-
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-
+            <?php
+            $categories = ['Saree', 'Kurti', 'Suits', 'Kids', 'Western', 'Jewelry', 'Sale', 'New'];
+            foreach ($categories as $cat): ?>
+                <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
+                    <img src="images/fruit.jpg" class="rounded-circle border p-1"
+                        style="width: 60px; height: 60px; object-fit: cover;">
+                    <p class="small mt-2 mb-0 fw-medium"><?= $cat; ?></p>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
-    <!-- product cards starts -->
+
+    <!-- Main Products Section -->
     <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h2 class="fw-bold mb-0" style="color: var(--brand-color);">Featured Products</h2>
-                <p class="text-muted mb-0">Handpicked for you</p>
-            </div>
-            <a href="#" class="btn btn-sm btn-outline-secondary">View All</a>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0" style="color: var(--brand-color);">Featured Products</h2>
+            <a href="all_products.php" class="btn btn-sm btn-outline-dark rounded-pill px-3">View All</a>
         </div>
 
-        <div class="row row-cols-2  row-cols-md-3 row-cols-lg-4 g-2">
-            <!-- Product Item 1 -->
-            <?php
-            // 1. Ensure your query selects the necessary fields
-// $result = mysqli_query($conn, "SELECT id, name, price, image FROM products");
-            
-            while ($row = mysqli_fetch_assoc($result)):
-                $id = $row['id']; // Use the actual ID from your DB
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+            <?php while ($row = mysqli_fetch_assoc($product_result)):
+                $id = $row['id'];
                 ?>
-                <div class="col mb-4">
+                <div class="col">
                     <div class="card h-100 border-0 shadow-sm product-card">
-                        <a href="product.php?id=<?php echo $id; ?>">
-                            <!-- Dynamic Image -->
-                            <img src="images/<?php echo $row['image']; ?>" class="card-img-top p-2 rounded-4"
-                                alt="<?php echo $row['name']; ?>">
+                        <a href="product.php?id=<?= $id; ?>" class="text-decoration-none text-dark">
+                            <img src="images/<?= $row['image']; ?>" class="card-img-top p-2"
+                                style="height: 200px; object-fit: contain;" alt="<?= $row['name']; ?>">
+                            <div class="px-3 py-2">
+                                <h6 class="text-truncate mb-1"><?= $row['name']; ?></h6>
+                                <p class="fw-bold text-success mb-2">₹<?= number_format($row['price'], 2); ?></p>
+                            </div>
                         </a>
 
-                        <div class="card-body">
-                            <!-- Dynamic Name -->
-                            <h5 class="card-title fs-6"><?php echo $row['name']; ?></h5>
-
-                            <!-- Dynamic Price -->
-                            <p class="card-text fw-bold text-success">₹<?php echo $row['price']; ?></p>
-
-                            <div class="d-flex gap-1">
-                                <!-- CART LOGIC START -->
-                                <div class="w-100">
+                        <div class="card-body pt-0 mt-auto">
+                            <div class="d-flex align-items-center gap-1">
+                                <!-- CART LOGIC -->
+                                <div class="flex-grow-1">
                                     <?php if (isset($_SESSION['cart'][$id])): ?>
-                                        <div class="btn-group btn-group-sm w-100" role="group">
-                                            <!-- Decrease Button (-) -->
-                                            <form method="POST" class="m-0 p-0">
-                                                <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                                        <div class="btn-group btn-group-sm w-100 border rounded-pill overflow-hidden">
+                                            <form method="POST" class="m-0">
+                                                <input type="hidden" name="product_id" value="<?= $id; ?>">
                                                 <input type="hidden" name="action" value="decrease">
                                                 <button type="submit" name="update_cart"
-                                                    class="btn btn-success rounded-start">-</button>
+                                                    class="btn btn-light border-0">-</button>
                                             </form>
-
-                                            <button type="button"
-                                                class="btn btn-success disabled fw-bold border-start border-end">
-                                                <?php echo $_SESSION['cart'][$id]['quantity']; ?>
+                                            <button type="button" class="btn btn-white disabled fw-bold border-0 flex-grow-1">
+                                                <?= $_SESSION['cart'][$id]['quantity']; ?>
                                             </button>
-
-                                            <!-- Increase Button (+) -->
-                                            <form method="POST" class="m-0 p-0">
-                                                <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                                            <form method="POST" class="m-0">
+                                                <input type="hidden" name="product_id" value="<?= $id; ?>">
                                                 <input type="hidden" name="action" value="increase">
                                                 <button type="submit" name="update_cart"
-                                                    class="btn btn-success rounded-end">+</button>
+                                                    class="btn btn-light border-0">+</button>
                                             </form>
                                         </div>
                                     <?php else: ?>
-                                        <!-- Add to Cart Button -->
-                                        <form method="POST" class="w-100">
-                                            <input type="hidden" name="product_id" value="<?php echo $id; ?>">
-                                            <input type="hidden" name="product_name" value="<?php echo $row['name']; ?>">
-                                            <input type="hidden" name="product_price" value="<?php echo $row['price']; ?>">
+                                        <form method="POST" class="m-0">
+                                            <input type="hidden" name="product_id" value="<?= $id; ?>">
+                                            <input type="hidden" name="product_name" value="<?= $row['name']; ?>">
+                                            <input type="hidden" name="product_price" value="<?= $row['price']; ?>">
                                             <input type="hidden" name="action" value="add">
                                             <button type="submit" name="update_cart"
-                                                class="btn btn-sm btn-outline-success w-100">Add to Cart</button>
+                                                class="btn btn-sm btn-outline-success w-100 rounded-pill">Add to Cart</button>
                                         </form>
                                     <?php endif; ?>
                                 </div>
-                                <!-- CART LOGIC END -->
 
-                                <!-- WISHLIST LOGIC START -->
-                                <form method="POST" action="wishlist_action.php" class="ms-1">
-                                    <input type="hidden" name="product_id" value="<?php echo $id; ?>">
-                                    <button type="submit" name="add_to_wishlist" class="btn btn-sm btn-outline-danger">
+                                <!-- WISHLIST TOGGLE -->
+                                <form method="POST" action="wishlist_action.php" class="m-0">
+                                    <input type="hidden" name="product_id" value="<?= $id; ?>">
+                                    <button type="submit" name="add_to_wishlist"
+                                        class="btn btn-sm btn-outline-danger border-0 rounded-circle">
                                         <?php
-                                        $user_id = $_SESSION['user_id'] ?? 0;
-                                        $heart_class = "fa-regular";
-                                        if ($user_id > 0) {
-                                            $check = mysqli_query($conn, "SELECT * FROM wishlist WHERE user_id = '$user_id' AND product_id = '$id'");
-                                            if (mysqli_num_rows($check) > 0) {
-                                                $heart_class = "fa-solid text-danger";
-                                            }
+                                        $u_id = $_SESSION['user_id'] ?? 0;
+                                        $heart = "fa-regular";
+                                        if ($u_id > 0) {
+                                            $check = mysqli_query($conn, "SELECT id FROM wishlist WHERE user_id = '$u_id' AND product_id = '$id'");
+                                            if (mysqli_num_rows($check) > 0)
+                                                $heart = "fa-solid";
                                         }
                                         ?>
-                                        <i class="<?php echo $heart_class; ?> fa-heart fs-5"></i>
+                                        <i class="<?= $heart; ?> fa-heart fs-5"></i>
                                     </button>
                                 </form>
-                                <!-- WISHLIST LOGIC END -->
                             </div>
                         </div>
                     </div>
                 </div>
             <?php endwhile; ?>
-
-
         </div>
     </div>
-    <!-- product cards ended -->
+    <main>
 
 
-    <!-- 5. Footer -->
-    <footer class="bg-white border-top py-4 mt-5">
+
+    </main>
+    <!-- Footer -->
+    <footer class="bg-white border-top py-5 mt-5">
         <div class="container text-center">
-            <h4 class="fw-bold" style="color: var(--brand-color);">Shodio</h4>
-            <p class="text-muted small">© 2026 Shodio E-Commerce. All rights reserved.</p>
-            <div class="d-flex justify-content-center gap-3 fs-5">
-                <i class="fa-brands fa-instagram"></i>
-                <i class="fa-brands fa-facebook"></i>
-                <i class="fa-brands fa-whatsapp"></i>
+            <div class="d-flex justify-content-center gap-4 fs-4 mb-4">
+                <a href="#" class="text-dark"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="text-dark"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" class="text-dark"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
+
+            <h3 class="fw-bold mb-3" style="color: var(--brand-color);">Shodio</h3>
+
+            <p class="text-secondary x-small">© 2026 Shodio E-Commerce. All rights reserved.</p>
         </div>
     </footer>
-    <!-- footer ended -->
 
-
-    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
