@@ -245,80 +245,69 @@ if (!$result) {
                             <p class="card-text fw-bold text-success">₹<?php echo $row['price']; ?></p>
 
                             <div class="d-flex gap-1">
-                                <form method="POST" class="w-100">
-                                    <input type="hidden" name="product_id" value="<?php echo $id; ?>">
-                                    <input type="hidden" name="product_name" value="<?php echo $row['name']; ?>">
-                                    <input type="hidden" name="product_price" value="<?php echo $row['price']; ?>">
-
+                                <!-- CART LOGIC START -->
+                                <div class="w-100">
                                     <?php if (isset($_SESSION['cart'][$id])): ?>
                                         <div class="btn-group btn-group-sm w-100" role="group">
-                                            <button type="submit" name="update_cart" class="btn btn-success">
-                                                <input type="hidden" name="action" value="decrease">-
-                                            </button>
-                                            <button type="button" class="btn btn-success disabled fw-bold">
+                                            <!-- Decrease Button (-) -->
+                                            <form method="POST" class="m-0 p-0">
+                                                <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                                                <input type="hidden" name="action" value="decrease">
+                                                <button type="submit" name="update_cart"
+                                                    class="btn btn-success rounded-start">-</button>
+                                            </form>
+
+                                            <button type="button"
+                                                class="btn btn-success disabled fw-bold border-start border-end">
                                                 <?php echo $_SESSION['cart'][$id]['quantity']; ?>
                                             </button>
-                                            <button type="submit" name="update_cart" class="btn btn-success">
-                                                <input type="hidden" name="action" value="increase">+
-                                            </button>
+
+                                            <!-- Increase Button (+) -->
+                                            <form method="POST" class="m-0 p-0">
+                                                <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                                                <input type="hidden" name="action" value="increase">
+                                                <button type="submit" name="update_cart"
+                                                    class="btn btn-success rounded-end">+</button>
+                                            </form>
                                         </div>
                                     <?php else: ?>
-                                        <input type="hidden" name="action" value="add">
-                                        <button type="submit" name="update_cart"
-                                            class="btn btn-sm btn-outline-success w-100">Add to Cart</button>
+                                        <!-- Add to Cart Button -->
+                                        <form method="POST" class="w-100">
+                                            <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                                            <input type="hidden" name="product_name" value="<?php echo $row['name']; ?>">
+                                            <input type="hidden" name="product_price" value="<?php echo $row['price']; ?>">
+                                            <input type="hidden" name="action" value="add">
+                                            <button type="submit" name="update_cart"
+                                                class="btn btn-sm btn-outline-success w-100">Add to Cart</button>
+                                        </form>
                                     <?php endif; ?>
-                                </form>
-                                <form method="POST" action="wishlist_action.php" class="w-100">
-    <input type="hidden" name="product_id" value="<?php echo $id; ?>">
-    <input type="hidden" name="product_name" value="<?php echo $row['name']; ?>">
-    <!-- Include user_id from session if logged in -->
-    <button type="submit" name="add_to_wishlist" class="btn btn-sm btn-outline-danger w-25">
-        <i class="fa-regular fa-heart"></i>
-    </button>
-</form>
+                                </div>
+                                <!-- CART LOGIC END -->
 
+                                <!-- WISHLIST LOGIC START -->
+                                <form method="POST" action="wishlist_action.php" class="ms-1">
+                                    <input type="hidden" name="product_id" value="<?php echo $id; ?>">
+                                    <button type="submit" name="add_to_wishlist" class="btn btn-sm btn-outline-danger">
+                                        <?php
+                                        $user_id = $_SESSION['user_id'] ?? 0;
+                                        $heart_class = "fa-regular";
+                                        if ($user_id > 0) {
+                                            $check = mysqli_query($conn, "SELECT * FROM wishlist WHERE user_id = '$user_id' AND product_id = '$id'");
+                                            if (mysqli_num_rows($check) > 0) {
+                                                $heart_class = "fa-solid text-danger";
+                                            }
+                                        }
+                                        ?>
+                                        <i class="<?php echo $heart_class; ?> fa-heart fs-5"></i>
+                                    </button>
+                                </form>
+                                <!-- WISHLIST LOGIC END -->
                             </div>
                         </div>
                     </div>
                 </div>
             <?php endwhile; ?>
 
-
-            <!-- Product Item 8 -->
-            <div class="col">
-                <div class="card h-100 border-0 shadow-sm product-card">
-                    <img src="images/fruit3.jpg" class="card-img-top p-2 rounded-4" alt="Product">
-                    <div class="card-body">
-                        <h5 class="card-title fs-6">Wedding Special Lehenga</h5>
-                        <p class="card-text fw-bold text-success">₹1,499</p>
-                        <div class="d-flex gap-1">
-                            <form method="POST" class="w-50">
-                                <input type="hidden" name="product_id" value="7">
-                                <input type="hidden" name="product_name" value="Designer Festive Saree">
-                                <input type="hidden" name="product_price" value="1499">
-                                <?php if (isset($_SESSION['cart'][7])): ?>
-                                    <div class="btn-group btn-group-sm w-100" role="group">
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="decrease">-
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-success disabled fw-bold"><?php echo $_SESSION['cart'][7]['quantity']; ?></button>
-                                        <button type="submit" name="update_cart" value="1" class="btn btn-success">
-                                            <input type="hidden" name="action" value="increase">+
-                                        </button>
-                                    </div>
-                                <?php else: ?>
-                                    <input type="hidden" name="action" value="add">
-                                    <button type="submit" name="update_cart"
-                                        class="btn btn-sm btn-outline-success w-100">Add</button>
-                                <?php endif; ?>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-outline-danger w-50"><i
-                                    class="fa-regular fa-heart"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
         </div>
     </div>

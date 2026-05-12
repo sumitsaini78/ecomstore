@@ -98,8 +98,7 @@ session_start();
 
                     ?>
                 </h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card’s content.</p>
+                <p class="card-text"></p>
             </div>
             <div class="card-body">
                 <div class="row border ">
@@ -141,18 +140,19 @@ session_start();
                         <h2>wishlist</h2>
                         <div class="col">
                             <?php
-                            $query = "select product_title from wishlist";
+                            $query = "SELECT product_title FROM wishlist";
                             $result = mysqli_query($conn, $query);
-                            $row = mysqli_fetch_assoc($result);
-print_r($row);
-                            foreach ($row as $pt) {
-                                echo $pt ;
+                            echo "<h5>Aapke Favourites:</h5>";
+                            echo "<ul class='list-group'>";
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<li class='list-group-item d-flex justify-content-between align-items-center'>";
+                                echo $row['product_title']; // Product ka naam // Amount
+                                echo "</li>";
                             }
-                            // Output: Red Green Blue 
-                            
 
-
+                            echo "</ul>";
                             ?>
+
 
                         </div>
                     </div>
