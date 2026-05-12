@@ -106,39 +106,55 @@ session_start();
                     <div class="col text-center">
                         <h2>orders</h2>
                         <div class="col">
-<?php
-// Maan lete hain user login hai aur uski ID session mein hai
-$user_id = $_SESSION['user_id'];
+                            <?php
+                            // Maan lete hain user login hai aur uski ID session mein hai
+                            $user_id = $_SESSION['user_id'];
 
-// SQL JOIN: orders aur order_items ko aapas mein joda gaya hai
-$query = "SELECT oi.product_name, oi.product_price, o.order_date 
+                            // SQL JOIN: orders aur order_items ko aapas mein joda gaya hai
+                            $query = "SELECT oi.product_name, oi.product_price, o.order_date 
           FROM order_items oi
           JOIN orders o ON oi.order_id = o.id 
           WHERE o.user_id = '$user_id' 
           ORDER BY o.order_date DESC";
 
-$result = mysqli_query($conn, $query);
+                            $result = mysqli_query($conn, $query);
 
-if (mysqli_num_rows($result) > 0) {
-    echo "<h5>Aapke Orders:</h5>";
-    echo "<ul class='list-group'>";
-    
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo "<li class='list-group-item d-flex justify-content-between align-items-center'>";
-        echo $row['product_name']; // Product ka naam
-        echo "<span class='badge bg-success rounded-pill'>₹" . number_format($row['product_price']) . "</span>"; // Amount
-        echo "</li>";
-    }
-    
-    echo "</ul>";
-} else {
-    echo "Aapne abhi tak koi order nahi kiya hai.";
-}
-?>
+                            if (mysqli_num_rows($result) > 0) {
+                                echo "<h5>Aapke Orders:</h5>";
+                                echo "<ul class='list-group'>";
+
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<li class='list-group-item d-flex justify-content-between align-items-center'>";
+                                    echo $row['product_name']; // Product ka naam
+                                    echo "<span class='badge bg-success rounded-pill'>₹" . number_format($row['product_price']) . "</span>"; // Amount
+                                    echo "</li>";
+                                }
+
+                                echo "</ul>";
+                            } else {
+                                echo "Aapne abhi tak koi order nahi kiya hai.";
+                            }
+                            ?>
                         </div>
                     </div>
                     <div class="col text-center">
                         <h2>wishlist</h2>
+                        <div class="col">
+                            <?php
+                            $query = "select product_title from wishlist";
+                            $result = mysqli_query($conn, $query);
+                            $row = mysqli_fetch_assoc($result);
+print_r($row);
+                            foreach ($row as $pt) {
+                                echo $pt ;
+                            }
+                            // Output: Red Green Blue 
+                            
+
+
+                            ?>
+
+                        </div>
                     </div>
                 </div>
             </div>

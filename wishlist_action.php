@@ -10,7 +10,7 @@ if (isset($_POST['add_to_wishlist'])) {
     }
 
     $user_id = $_SESSION['user_id'];
-    $product_id = $_POST['product_id']; 
+    $product_id = $_POST['product_id'];
     $product_title = $_POST['product_name'];
 
     // Check if item is already in wishlist to avoid duplicates
