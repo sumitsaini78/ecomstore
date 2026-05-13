@@ -43,7 +43,7 @@ $count_categories = mysqli_num_rows(mysqli_query($conn, "SELECT category_id FROM
                 <div class="card-body">
                     <h6 class="text-uppercase small">Active Orders</h6>
                     <h2 class="fw-bold"><?= $count_orders; ?></h2>
-                    <a href="manage_orders.php" class="text-white text-decoration-none small stretched-link">Track Orders <i class="fa-solid fa-arrow-right"></i></a>
+                    <a href="orders.php" class="text-white text-decoration-none small stretched-link">Track Orders <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
                 <i class="fa-solid fa-cart-shopping icon-box"></i>
             </div>
@@ -72,6 +72,18 @@ $count_categories = mysqli_num_rows(mysqli_query($conn, "SELECT category_id FROM
                 <i class="fa-solid fa-users icon-box"></i>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="card dash-card bg-info text-white p-3 h-100">
+                <div class="card-body">
+                    <h6 class="text-uppercase small">Vendors / Sellers</h6>
+                
+                    <h5 class="card-title">Vendors</h5>
+                    <a href="vendors.php" class="btn btn-primary btn-sm">Manage Vendors</a>
+                </div>
+                <i class="fa-solid fa-users icon-box"></i>
+            </div>
+        </div>
+        
     </div>
     <!--  -->
     

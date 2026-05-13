@@ -14,16 +14,16 @@ Backend (Admin Panel):
 - admin/dashboard.php → Analytics overview / done 
 - admin/products.php → Manage products (add/edit/delete) / done
 - admin/categories.php → Manage categories  / done
-- admin/vendors.php → Manage vendors/sellers 
-- admin/orders.php → Manage customer orders
-- admin/coupons.php → Create/manage coupons and discounts
-- admin/reports.php → Sales & order reports
-- admin/settings.php → Site, theme, SEO settings
+- admin/vendors.php → Manage vendors/sellers / done
+- admin/orders.php → Manage customer orders / done
+- admin/coupons.php → Create/manage coupons and discounts /done
+- admin/reports.php → Sales & order reports             / done                                                                                                                                                                                                
+- admin/settings.php → Site, theme, SEO settings /done
 
 Vendor Panel:
-- vendor/dashboard.php → Vendor-specific analytics
+- vendor/dashboard.php → Vendor-specific analytics /
 - vendor/products.php → Vendor product management
-- vendor/orders.php → Orders for vendor's products
+- vendor/orders.php → Orders for vendor's products 
 
 Shared:
 - db.php → Database connection

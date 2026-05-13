@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("admin/db.php"); // Ensure path is correct based on your folder structure
+include("db.php");
 
 // 1. Add Vendor Logic
 if (isset($_POST['add_vendor'])) {
@@ -10,13 +10,26 @@ if (isset($_POST['add_vendor'])) {
     $store = mysqli_real_escape_string($conn, $_POST['v_store']);
 
     $insert = "INSERT INTO vendors (v_name, v_email, v_phone, v_store) VALUES ('$name', '$email', '$phone', '$store')";
-    if(mysqli_query($conn, $insert)) {
-        header("Location: vendors.php?msg=added");
-        exit;
-    }
+    mysqli_query($conn, $insert);
+    header("Location: vendors.php?msg=added");
+    exit;
 }
 
-// 2. Delete Vendor Logic
+// 2. Update Vendor Logic (NEW)
+if (isset($_POST['update_vendor'])) {
+    $id = (int)$_POST['v_id'];
+    $name = mysqli_real_escape_string($conn, $_POST['v_name']);
+    $email = mysqli_real_escape_string($conn, $_POST['v_email']);
+    $phone = mysqli_real_escape_string($conn, $_POST['v_phone']);
+    $store = mysqli_real_escape_string($conn, $_POST['v_store']);
+
+    $update = "UPDATE vendors SET v_name='$name', v_email='$email', v_phone='$phone', v_store='$store' WHERE v_id=$id";
+    mysqli_query($conn, $update);
+    header("Location: vendors.php?msg=updated");
+    exit;
+}
+
+// 3. Delete Vendor Logic
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM vendors WHERE v_id = $id");
@@ -24,7 +37,6 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// 3. Fetch Vendors
 $vendors = mysqli_query($conn, "SELECT * FROM vendors ORDER BY v_id DESC");
 ?>
 
@@ -81,24 +93,28 @@ $vendors = mysqli_query($conn, "SELECT * FROM vendors ORDER BY v_id DESC");
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(mysqli_num_rows($vendors) > 0): ?>
-                                <?php while($row = mysqli_fetch_assoc($vendors)): ?>
-                                <tr>
-                                    <td><?= $row['v_name']; ?></td>
-                                    <td><span class="badge bg-secondary"><?= $row['v_store']; ?></span></td>
-                                    <td><?= $row['v_email']; ?><br><small><?= $row['v_phone']; ?></small></td>
-                                    <td class="text-center">
-                                        <a href="vendors.php?delete=<?= $row['v_id']; ?>" 
-                                           class="text-danger" 
-                                           onclick="return confirm('Delete this vendor?')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <?php endwhile; ?>
-                            <?php else: ?>
-                                <tr><td colspan="4" class="text-center py-4">No vendors added yet.</td></tr>
-                            <?php endif; ?>
+                            <?php while($row = mysqli_fetch_assoc($vendors)): ?>
+                            <tr>
+                                <td><?= $row['v_name']; ?></td>
+                                <td><span class="badge bg-secondary"><?= $row['v_store']; ?></span></td>
+                                <td><?= $row['v_email']; ?><br><small><?= $row['v_phone']; ?></small></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary editBtn" 
+                                        data-id="<?= $row['v_id']; ?>"
+                                        data-name="<?= $row['v_name']; ?>"
+                                        data-email="<?= $row['v_email']; ?>"
+                                        data-phone="<?= $row['v_phone']; ?>"
+                                        data-store="<?= $row['v_store']; ?>"
+                                        data-bs-toggle="modal" data-bs-target="#editModal">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+
+                                    <a href="vendors.php?delete=<?= $row['v_id']; ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this vendor?')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
@@ -106,6 +122,58 @@ $vendors = mysqli_query($conn, "SELECT * FROM vendors ORDER BY v_id DESC");
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Vendor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="" method="POST">
+        <div class="modal-body">
+            <input type="hidden" name="v_id" id="edit_v_id">
+            <div class="mb-2">
+                <label class="small fw-bold">Vendor Name</label>
+                <input type="text" name="v_name" id="edit_v_name" class="form-control" required>
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Email</label>
+                <input type="email" name="v_email" id="edit_v_email" class="form-control" required>
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Phone</label>
+                <input type="text" name="v_phone" id="edit_v_phone" class="form-control" required>
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold">Store Name</label>
+                <input type="text" name="v_store" id="edit_v_store" class="form-control">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="update_vendor" class="btn btn-primary">Update Vendor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('.editBtn').on('click', function() {
+        // Data attributes se values nikal kar modal ke fields mein bharna
+        $('#edit_v_id').val($(this).data('id'));
+        $('#edit_v_name').val($(this).data('name'));
+        $('#edit_v_email').val($(this).data('email'));
+        $('#edit_v_phone').val($(this).data('phone'));
+        $('#edit_v_store').val($(this).data('store'));
+    });
+});
+</script>
 
 </body>
 </html>
