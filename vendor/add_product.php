@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("db.php");
+include("../admin/db.php");
 
 $msg = "";
 
