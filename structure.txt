@@ -10,10 +10,10 @@ Frontend (Customer Side):
 - search.php → Product search and filters / done
 
 Backend (Admin Panel):
-- admin/index.php → Admin login
-- admin/dashboard.php → Analytics overview
-- admin/products.php → Manage products (add/edit/delete)
-- admin/categories.php → Manage categories
+- admin/index.php → Admin login / done
+- admin/dashboard.php → Analytics overview / done 
+- admin/products.php → Manage products (add/edit/delete) / done
+- admin/categories.php → Manage categories  / done
 - admin/vendors.php → Manage vendors/sellers 
 - admin/orders.php → Manage customer orders
 - admin/coupons.php → Create/manage coupons and discounts
