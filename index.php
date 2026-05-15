@@ -157,14 +157,32 @@ if (!$product_result) {
     <div class="container-fluid bg-white py-3 shadow-sm border-bottom mb-4">
         <div class="d-flex flex-nowrap overflow-x-auto gap-4 px-2 text-center no-scrollbar">
             <?php
-            $categories = ['Saree', 'Kurti', 'Suits', 'Kids', 'Western', 'Jewelry', 'Sale', 'New'];
-            foreach ($categories as $cat): ?>
-                <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                    <img src="images/fruit.jpg" class="rounded-circle border p-1"
-                        style="width: 60px; height: 60px; object-fit: cover;">
-                    <p class="small mt-2 mb-0 fw-medium"><?= $cat; ?></p>
-                </a>
-            <?php endforeach; ?>
+            $query = "SELECT * FROM categories";
+            $result = mysqli_query($conn, $query);
+
+            // Check if there are results in the database
+            if (mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    ?>
+                    <a href="category.php?id=<?= $row['category_id']; ?>" class="text-decoration-none text-dark flex-shrink-0"
+                        style="width: 80px;">
+                        <img src="cat_images/<?= $row['cat_img']; ?>" class="rounded-circle border p-1"
+                            style="width: 60px; height: 60px; object-fit: cover;" alt="<?= $row['cat_title']; ?>">
+                        <p class="small mt-2 mb-0 fw-medium"><?= $row['cat_title']; ?></p>
+                    </a>
+                    <?php
+                }
+            } else {
+                // FALLBACK: If database is empty, show your hardcoded list
+                $categories = ['Saree', 'Kurti', 'Suits', 'Kids', 'Western', 'Jewelry', 'Sale', 'New'];
+                foreach ($categories as $cat): ?>
+                    <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
+                        <img src="images/fruit.jpg" class="rounded-circle border p-1"
+                            style="width: 60px; height: 60px; object-fit: cover;">
+                        <p class="small mt-2 mb-0 fw-medium"><?= $cat; ?></p>
+                    </a>
+                <?php endforeach;
+            } ?>
         </div>
     </div>
 
@@ -227,6 +245,9 @@ if (!$product_result) {
                                 <!-- WISHLIST TOGGLE -->
                                 <form method="POST" action="wishlist_action.php" class="m-0">
                                     <input type="hidden" name="product_id" value="<?= $id; ?>">
+                                    <input type="hidden" name="product_title" value="<?=
+                                        $product_name; ?>">
+                        
                                     <button type="submit" name="add_to_wishlist"
                                         class="btn btn-sm btn-outline-danger border-0 rounded-circle">
                                         <?php
@@ -239,7 +260,7 @@ if (!$product_result) {
                                         }
                                         ?>
                                         <i class="<?= $heart; ?> fa-heart fs-5"></i>
-                                    </button>
+                                    </button id="catin">
                                 </form>
                             </div>
                         </div>
@@ -267,7 +288,12 @@ if (!$product_result) {
             <p class="text-secondary x-small">© 2026 Shodio E-Commerce. All rights reserved.</p>
         </div>
     </footer>
-
+<!-- <script>
+document.getElementById("#catin").addEventListener(click,function alert($product_name) 
+{
+alert($product_name);    
+})
+</script> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

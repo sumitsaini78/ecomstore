@@ -1,5 +1,36 @@
 <?php
 session_start();
+
+// ========================================================
+// 1. BACKEND CART LOGIC (Must execute before any HTML output)
+// ========================================================
+
+// Handle Quantity Update
+if (isset($_POST['update_qty'])) {
+    $id = $_POST['product_id'];
+    $new_qty = (int) $_POST['quantity'];
+    
+    if ($new_qty > 0 && isset($_SESSION['cart'][$id])) {
+        $_SESSION['cart'][$id]['quantity'] = $new_qty;
+    }
+    
+    header("Location: cart.php"); // Safe redirect back to refresh totals
+    exit();
+}
+
+// Handle Remove Item
+if (isset($_GET['remove'])) {
+    $id = $_GET['remove'];
+    
+    if (isset($_SESSION['cart'][$id])) {
+        unset($_SESSION['cart'][$id]);
+    }
+    
+    header("Location: cart.php"); // Safe redirect back to refresh state
+    exit();
+}
+
+$total_bill = 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,11 +42,13 @@ session_start();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <title>Shodio - EcomStore</title>
     <style>
+        /* Modern standard to hide horizontal scrollbar rails while preserving finger-scroll functionality */
         .no-scrollbar {
-            -ms-overflow-style: none;
-
-            /* Firefox */
-            scrollbar-width: none;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;     /* Firefox */
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;             /* Chrome, Safari and Opera */
         }
 
         .Product-cards {
@@ -31,7 +64,7 @@ session_start();
 </head>
 
 <body class="p-0 m-0 border-0 bg-light">
-    <!-- Navbar start -->
+    
     <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4 sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand fs-1 fw-bold" style="color:#570d48;" href="index.php">Shodio</a>
@@ -53,118 +86,56 @@ session_start();
                     <a href="cart.php" class="text-dark position-relative">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            style="font-size: 10px;"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>
+                            style="font-size: 10px;">
+                            <?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>
+                        </span>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
-    <!-- Navbar ended -->
 
-
-    <!-- Quick Category Menu starts -->
     <div class="container-fluid bg-white py-3 shadow-sm border-bottom">
-        <!-- Added 'no-scrollbar' class here -->
         <div class="d-flex flex-nowrap overflow-x-auto gap-4 px-2 text-center no-scrollbar">
 
             <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
+                <img src="images/fruit.jpg" class="rounded-circle border p-1" style="width: 70px; height: 70px; object-fit: cover;">
                 <p class="small mt-2 mb-0 fw-medium">Saree</p>
             </a>
 
             <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit1.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
+                <img src="images/fruit1.jpg" class="rounded-circle border p-1" style="width: 70px; height: 70px; object-fit: cover;">
                 <p class="small mt-2 mb-0 fw-medium">Kurti</p>
             </a>
 
-            <!-- Repeat for other categories... -->
             <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit2.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
+                <img src="images/fruit2.jpg" class="rounded-circle border p-1" style="width: 70px; height: 70px; object-fit: cover;">
                 <p class="small mt-2 mb-0 fw-medium">Suits</p>
             </a>
 
             <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
+                <img src="images/fruit3.jpg" class="rounded-circle border p-1" style="width: 70px; height: 70px; object-fit: cover;">
                 <p class="small mt-2 mb-0 fw-medium">Kids</p>
             </a>
 
             <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
+                <img src="images/fruit3.jpg" class="rounded-circle border p-1" style="width: 70px; height: 70px; object-fit: cover;">
                 <p class="small mt-2 mb-0 fw-medium">Offers</p>
             </a>
+            
             <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
+                <img src="images/fruit3.jpg" class="rounded-circle border p-1" style="width: 70px; height: 70px; object-fit: cover;">
                 <p class="small mt-2 mb-0 fw-medium">Offers</p>
             </a>
+            
             <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
-                <p class="small mt-2 mb-0 fw-medium">Offers</p>
-            </a>
-            <a href="#" class="text-decoration-none text-dark flex-shrink-0" style="width: 80px;">
-                <img src="images/fruit3.jpg" class="rounded-circle border p-1"
-                    style="width: 70px; height: 70px; object-fit: cover;">
+                <img src="images/fruit3.jpg" class="rounded-circle border p-1" style="width: 70px; height: 70px; object-fit: cover;">
                 <p class="small mt-2 mb-0 fw-medium">Offers</p>
             </a>
 
         </div>
     </div>
-    <!-- CART details starts -->
-    <?php
-    // 1. Quantity Update Logic
-    if (isset($_POST['update_qty'])) {
-        $id = $_POST['product_id'];
-        $new_qty = (int) $_POST['quantity'];
-        if ($new_qty > 0) {
-            $_SESSION['cart'][$id]['quantity'] = $new_qty;
-        }
-        header("Location: cart.php"); // Refresh to update totals
-        exit();
-    }
 
-    // 2. Remove Item Logic
-    if (isset($_GET['remove'])) {
-        $id = $_GET['remove'];
-        unset($_SESSION['cart'][$id]);
-        header("Location: cart.php");
-        exit();
-    }
-
-    $total_bill = 0;
-    ?>
-
-    <!-- Cart Table Section -->
     <section class="container my-5">
         <h2 class="fw-bold mb-4" style="color:#570d48;">Your Shopping Cart</h2>
 
@@ -181,25 +152,28 @@ session_start();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($_SESSION['cart'] as $id => $item):
+                        <?php 
+                        foreach ($_SESSION['cart'] as $id => $item):
                             $subtotal = $item['price'] * $item['quantity'];
                             $total_bill += $subtotal;
-                            ?>
+                        ?>
                             <tr>
-                                <td class="p-3 fw-medium"><?php echo $item['name']; ?></td>
+                                <td class="p-3 fw-medium"><?php echo htmlspecialchars($item['name']); ?></td>
                                 <td class="text-muted">₹<?php echo number_format($item['price'], 2); ?></td>
                                 <td>
                                     <form method="POST" action="" class="d-flex gap-2">
                                         <input type="hidden" name="product_id" value="<?php echo $id; ?>">
-                                        <input type="number" name="quantity" class="form-control form-control-sm" value="<?php echo $item['quantity']; ?>" min="1"
-                                            style="width: 60px;">
+                                        <input type="number" name="quantity" class="form-control form-control-sm" 
+                                               value="<?php echo $item['quantity']; ?>" min="1" style="width: 65px;">
                                         <button type="submit" name="update_qty" class="btn btn-sm btn-outline-primary">Update</button>
                                     </form>
                                 </td>
                                 <td class="fw-bold text-success">₹<?php echo number_format($subtotal, 2); ?></td>
                                 <td>
                                     <a href="cart.php?remove=<?php echo $id; ?>" class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Remove item?')"><i class="fa-solid fa-trash"></i></a>
+                                       onclick="return confirm('Remove item from cart?')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -209,7 +183,7 @@ session_start();
                             <td colspan="3" class="text-end fw-bold p-3">Grand Total:</td>
                             <td colspan="2" class="fw-bold text-primary">₹<?php echo number_format($total_bill, 2); ?></td>
                         </tr>
-                    </tfoot>
+                    </tbody>
                 </table>
             </div>
 
@@ -226,26 +200,20 @@ session_start();
             </div>
         <?php endif; ?>
     </section>
-    <!-- CART details ended -->
 
-
-    <!-- 5. Footer -->
     <footer class="bg-white border-top py-4 mt-5">
         <div class="container text-center">
-            <h4 class="fw-bold" style="color: var(--brand-color);">Shodio</h4>
+            <h4 class="fw-bold" style="color: #570d48;">Shodio</h4>
             <p class="text-muted small">© 2026 Shodio E-Commerce. All rights reserved.</p>
             <div class="d-flex justify-content-center gap-3 fs-5">
-                <i class="fa-brands fa-instagram"></i>
-                <i class="fa-brands fa-facebook"></i>
-                <i class="fa-brands fa-whatsapp"></i>
+                <a href="#" class="text-secondary"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="text-secondary"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#" class="text-secondary"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
         </div>
     </footer>
-    <!-- footer ended -->
 
-
-    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
-</html>
+</html> 

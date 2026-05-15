@@ -4,6 +4,7 @@ include("admin/db.php");
 
 if (isset($_POST['add_to_wishlist'])) {
     $product_id = $_POST['product_id'];
+    $product_title = $_POST['product_name'];
     $user_id = $_SESSION['user_id'] ?? 0;
 
     if ($user_id == 0) {
@@ -22,7 +23,7 @@ if (isset($_POST['add_to_wishlist'])) {
         mysqli_query($conn, $delete_query);
     } else {
         // 3. Agar nahi hai, toh INSERT (Add) kar do
-        $insert_query = "INSERT INTO wishlist (user_id, product_id) VALUES ('$user_id', '$product_id')";
+        $insert_query = "INSERT INTO wishlist (user_id, product_id,product_title) VALUES ('$user_id', '$product_id','$product_title')";
         mysqli_query($conn, $insert_query);
     }
 

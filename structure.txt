@@ -1,5 +1,5 @@
 Frontend (Customer Side):
-- index.php → Homepage with dynamic banners, featured products, categories  / Done
+- index.php → Homepage with dynamic banners, featured products, categories  / Done /error checking
 - product.php → Product detail page with variations (size, color) / done
 - cart.php → Shopping cart with quantity update, remove  / done
 - checkout.php → Checkout form & order confirmation  / done         

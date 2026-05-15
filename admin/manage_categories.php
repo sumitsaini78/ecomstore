@@ -5,14 +5,49 @@ include("db.php");
 // 1. Add Category Logic
 if (isset($_POST['add_cat'])) {
     $title = mysqli_real_escape_string($conn, $_POST['cat_title']);
-    if (!empty($title)) {
-        $insert = "INSERT INTO categories (cat_title) VALUES ('$title')";
-        mysqli_query($conn, $insert);
-        header("Location: manage_categories.php?msg=added");
-        exit;
+    
+    // Check if a file was actually uploaded without errors
+    if (!empty($title) && isset($_FILES['cat_img']) && $_FILES['cat_img']['error'] == 0) {
+        
+        $file = $_FILES['cat_img'];
+        $fileName = $file['name'];
+        $fileTmpName = $file['tmp_name'];
+        
+        // 1. Get the file extension safely (e.g., png, jpg)
+        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        
+        if (in_array($fileExt, $allowedExtensions)) {
+            
+            // 2. Generate a unique name so files don't overwrite each other
+            $uniqueImageName = uniqid('cat_', true) . "." . $fileExt;
+            
+            // 3. Define your upload directory path
+            $uploadDirectory = "../cat_images/" . $uniqueImageName;
+            
+            // 4. Move the file from temp storage to your images folder
+            if (move_uploaded_file($fileTmpName, $uploadDirectory)) {
+                
+                // 5. Insert into database (Fixed SQL quotes and variable usage)
+                $insert = "INSERT INTO categories (cat_title, cat_img) VALUES ('$title', '$uniqueImageName')";
+                
+                if (mysqli_query($conn, $insert)) {
+                    header("Location: manage_categories.php?msg=added");
+                    exit;
+                } else {
+                    echo "Database Error: " . mysqli_error($conn);
+                }
+                
+            } else {
+                echo "Failed to move uploaded file. Check folder permissions.";
+            }
+        } else {
+            echo "Invalid file type. Allowed types: JPG, JPEG, PNG, WEBP.";
+        }
+    } else {
+        echo "Please provide a title and select a valid image.";
     }
 }
-
 // 2. Delete Category Logic
 if (isset($_GET['delete'])) {
     $id = (int) $_GET['delete'];
@@ -42,9 +77,11 @@ $categories = mysqli_query($conn, "SELECT * FROM categories ORDER BY category_id
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-header bg-primary text-white fw-bold">Add New Category</div>
                     <div class="card-body">
-                        <form action="" method="POST">
+                        <form action="" method="POST" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label">Category Title</label>
+                                <input type="file" name="cat_img" class="form-control" placeholder="e.g. Saree, Kurti"
+                                    required>
                                 <input type="text" name="cat_title" class="form-control" placeholder="e.g. Saree, Kurti"
                                     required>
                             </div>
